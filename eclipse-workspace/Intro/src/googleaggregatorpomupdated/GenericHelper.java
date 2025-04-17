@@ -1,4 +1,4 @@
-package googleaggregator;
+package googleaggregatorpomupdated;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +17,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 public class GenericHelper {
 
-	public String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36";
+	static String userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36";
 
 	//public String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36";
     public String url = "https://www.google.com/shopping";
