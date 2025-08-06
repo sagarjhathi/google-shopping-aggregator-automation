@@ -1,0 +1,72 @@
+name: CI Pipeline at POM branch
+
+on:
+  push:
+    branches:
+      - '**'   # Runs on all branches
+  workflow_dispatch:
+  schedule:
+    - cron: '52 18 * * *'  # 12:22 AM IST daily
+    - cron: '30 22 * * *'  # 4:00 AM IST daily
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 24
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 24
+
+      - name: Notify Discord – Start of Test
+        shell: bash
+        if: always()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          timestamp=$(date -u +"%Y-%m-%d %H:%M UTC")
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{
+                     \"content\": \"🚀 **CI Test Started**\n🕒 **Start Time:** $timestamp\n🧪 [Click to view run]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)\"
+                   }" \
+               $DISCORD_WEBHOOK
+
+      - name: Run Maven Tests
+        working-directory: eclipse-workspace/Intro
+        run: mvn clean test
+        continue-on-error: true
+
+      - name: Upload Surefire Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: eclipse-workspace/Intro/target/surefire-reports
+
+      - name: Upload Extent Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-reports
+          path: eclipse-workspace/Intro/test-output/ExtentReports/
+
+      - name: Notify Discord – End of Test
+        if: always()
+        shell: bash
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          status="${{ job.status }}"
+          timestamp=$(date -u +"%Y-%m-%d %H:%M UTC")
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{
+                     \"content\": \"📢 **CI Test Run Status:** $status\n🕒 **End Time:** $timestamp\n📄 **Extent Report** is available in the [Artifacts section]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)\n🔗 [Click to View Run]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)\"
+                   }" \
+               $DISCORD_WEBHOOK
