@@ -1,0 +1,19 @@
+# Logs
+eclipse-workspace/Intro/logs/
+*.log
+
+# Build output
+eclipse-workspace/Intro/target/
+
+# Test reports
+eclipse-workspace/Intro/test-output/
+
+# Eclipse specific files
+eclipse-workspace/.metadata/
+eclipse-workspace/.settings/
+*.classpath
+*.project
+
+
+# Eclipse workspace metadata
+eclipse-workspace/.metadata/
